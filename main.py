@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from Flask import Flask, render_template # type: ignore
 import utils.spotify_client as spotify_client
 
 app = Flask(__name__)
