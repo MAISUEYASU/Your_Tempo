@@ -19,6 +19,11 @@ def search_tracks_by_tempo(tempo, limit=10):
     track_ids = [track['id'] for track in results['tracks']['items']]
     return track_ids
 
+def get_audio_features(track_ids):
+    # Spotify APIからトラックのオーディオフィーチャーを取得
+    audio_features = sp.audio_features(track_ids)
+    return audio_features
+
 def get_tracks_info(track_ids):
     tracks = sp.tracks(track_ids)['tracks']
     tracks_info = []
