@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify # type: ignore
 import utils.spotify_client as spotify_client
 
 app = Flask(__name__)

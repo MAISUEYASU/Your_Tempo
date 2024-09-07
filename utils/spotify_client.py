@@ -1,5 +1,5 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+import spotipy # type: ignore
+from spotipy.oauth2 import SpotifyOAuth # type: ignore
 from config.settings import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
@@ -18,6 +18,12 @@ def search_tracks_by_tempo(tempo, limit=10):
     results = sp.search(q=f'tempo:{min_tempo}-{max_tempo}', type='track', limit=limit)
     track_ids = [track['id'] for track in results['tracks']['items']]
     return track_ids
+
+# ユーザーの好きなアーティストを取得するサンプルコード
+def get_favorite_artists(user_id):
+    results = sp.current_user_top_artists(limit=10)
+    for idx, artist in enumerate(results['items']):
+        print(f"{idx + 1}. {artist['name']}")
 
 def get_audio_features(track_ids):
     # Spotify APIからトラックのオーディオフィーチャーを取得

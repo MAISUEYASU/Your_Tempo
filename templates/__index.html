@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Tempo</title>
+  </head>
+  <body>
+    <h1>Your tempo(テンポ測定アプリ)</h1>
+    <h3>あなたの気分でタップしてね</h3>
+    <button id="tapButton">Tap</button>
+    <p id="tempoDisplay">Tempo: 0 BPM</p>
+    <p id="playlist"></p>
+    <script>
+      let tapTimes = [];
+      let tempo = 0;
+
+      document
+        .getElementById("tapButton")
+        .addEventListener("click", function () {
+          const currentTime = Date.now();
+          tapTimes.push(currentTime);
+
+          if (tapTimes.length > 1) {
+            const intervals = tapTimes
+              .slice(1)
+              .map((time, i) => time - tapTimes[i]);
+            const avgInterval =
+              intervals.reduce((a, b) => a + b) / intervals.length;
+            tempo = Math.round(60000 / avgInterval);
+            document.getElementById(
+              "tempoDisplay"
+            ).textContent = `Tempo: ${tempo} BPM`;
+          }
+
+          // 5回以上タップした場合はテンポを計算してサーバーに送信します
+          if (tapTimes.length > 5) {
+            fetch("/create_playlist", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ tempo: tempo }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                document.getElementById(
+                  "playlist"
+                ).innerHTML = `<h2>Generated Playlist:</h2><ul>${data.tracks
+                  .map((track) => `<li>${track.name} by ${track.artist}</li>`)
+                  .join("")}</ul>`;
+              })
+              .catch((error) => console.error("Error:", error));
+            tapTimes = [];
+          }
+        });
+    </script>
+  </body>
+</html>
