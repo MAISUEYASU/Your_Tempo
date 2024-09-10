@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style.css" />
     <title>Your Tempo</title>
   </head>
   <body>
@@ -11,7 +12,6 @@
     <button id="tapButton">Tap</button>
     <p id="tempoDisplay">Tempo: 0 BPM</p>
     <p id="playlist"></p>
-
     <script>
       let tapTimes = [];
       let tempo = 0;
@@ -52,14 +52,19 @@
                   document.getElementById(
                     "playlist"
                   ).innerHTML = `<h2>Generated Playlist:</h2>
-                  <ul>${data.tracks
-                    .map((track) => `<li>${track.name} by ${track.artist}</li>`)
-                    .join("")}</ul>`;
+            <ul>${data.tracks
+              .map((track) => `<li>${track.name} by ${track.artist}</li>`)
+              .join("")}</ul>`;
                 } else {
                   alert("エラーが発生しました: " + data.error);
                 }
               })
-              .catch((error) => cosole.error("エラー:", error));
+              .catch((error) => {
+                alert(
+                  "プレイリストの作成中にエラーが発生しました。もう一度お試しください。"
+                );
+                console.error("エラー:", error);
+              });
             tapTimes = []; // タップの記録をリセット
           }
         });

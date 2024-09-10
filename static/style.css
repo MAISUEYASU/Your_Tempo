@@ -1,0 +1,42 @@
+@charset "utf-8";
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+}
+#tapButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 15px 32px;
+  font-size: 16px;
+  margin: 20px 0;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+#tapButton:hover {
+  background-color: #45a049;
+}
+h1,
+h3 {
+  color: #333;
+}
+#playlist ul {
+  list-style-type: none;
+  padding: 0;
+}
+#playlist li {
+  background: #fff;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+#tapButton:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
