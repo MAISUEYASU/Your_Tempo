@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="shortcut icon" href="/static/your_tempo.ico" />
+    <title>Your Tempo</title>
+  </head>
+  <body>
+    <h1>テンポ計測結果</h1>
+    <p>計測されたテンポ: <strong>{{ tempo }}</strong> BPM</p>
+
+    <!-- プレイリスト作成ボタン -->
+    <button id="create-playlist-btn">プレイリストを作成する</button>
+
+    <p id="message"></p>
+
+    <script>
+      document
+        .getElementById("create-playlist-btn")
+        .addEventListener("click", function () {
+          fetch("/create_playlist", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ tempo: `${tempo}` }), // テンポ値を渡す
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const messageElement = document.getElementById("message");
+              if (data.message) {
+                messageElement.innerHTML =
+                  'プレイリストが作成されました！<a href="${data.playlist_url}" target="_blank">こちらをクリックして再生</a>';
+              } else {
+                messageElement.textContent =
+                  "プレイリストの作成に失敗しました。";
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.getElementById("message").textContent =
+                "エラーが発生しました。もう一度お試しください。";
+            });
+        });
+    </script>
+  </body>
+</html>

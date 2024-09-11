@@ -25,6 +25,9 @@ h1,
 h3 {
   color: #333;
 }
+h1 {
+  margin-top: 50px;
+}
 #playlist ul {
   list-style-type: none;
   padding: 0;
