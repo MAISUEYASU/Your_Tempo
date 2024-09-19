@@ -11,13 +11,14 @@ def tap():
     # 少なくとも2回のタップが必要
     if len(tap_times) > 1:
         bpm = calculate_tempo(tap_times)
-        print(f"BPM: {bpm}")
+    print(f"BPM: {bpm}")
+
 
 # BPM（テンポ）を計算する関数
 def calculate_tempo(tap_times):
     if len(tap_times) < 2:
         print("タップ回数が足りません")
-        return
+        return None
     
     # 各タップの時間間隔を計算
     intervals = [tap_times[i] - tap_times[i - 1] for i in range(1, len(tap_times))]

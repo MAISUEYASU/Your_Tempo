@@ -8,7 +8,7 @@
     <title>Your Tempo</title>
   </head>
   <body>
-    <h1>Your tempo</h1>
+    <h1>Your Tempo</h1>
     <h3>(テンポ測定アプリ)</h3>
     <h3>あなたの気分でタップしてね</h3>
     <button id="tapButton">Tap</button>
@@ -53,7 +53,7 @@
                   // 取得したプレイリストの曲を表示
                   document.getElementById(
                     "playlist"
-                  ).innerHTML = `<h2>Generated Playlist:</h2>
+                  ).innerHTML = `<h2>生成されたプレイリスト:</h2>
             <ul>${data.tracks
               .map((track) => `<li>${track.name} by ${track.artist}</li>`)
               .join("")}</ul>`;

@@ -1,12 +1,12 @@
-import spotipy # type: ignore
-from spotipy.oauth2 import SpotifyOAuth # type: ignore
-from config.settings import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, REDIRECT_URI
+import spotipy 
+from spotipy.oauth2 import SpotifyOAuth 
+from config.settings import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    client_id=SPOTIFY_CLIENT_ID,
-    client_secret=SPOTIFY_CLIENT_SECRET,
-    redirect_uri=REDIRECT_URI,
-    scope="user-library-read"
+    client_id=SPOTIPY_CLIENT_ID,
+    client_secret=SPOTIPY_CLIENT_SECRET,
+    redirect_uri=SPOTIPY_REDIRECT_URI,
+    scope="playlist-modify-public"
 ))
 
 def search_tracks_by_tempo(tempo, limit=10):
@@ -18,6 +18,14 @@ def search_tracks_by_tempo(tempo, limit=10):
     results = sp.search(q=f'tempo:{min_tempo}-{max_tempo}', type='track', limit=limit)
     track_ids = [track['id'] for track in results['tracks']['items']]
     return track_ids
+
+def create_playlist(name):
+    user_id = sp.current_user()['id']
+    playlist = sp.user_playlist_create(user_id, name)
+    return playlist['id']
+
+def add_tracks_to_playlist(playlist_id, track_ids):
+    sp.playlist_add_items(playlist_id, track_ids)
 
 # ユーザーの好きなアーティストを取得するサンプルコード
 def get_favorite_artists(user_id):
@@ -33,9 +41,7 @@ def get_audio_features(track_ids):
 def get_tracks_info(track_ids):
     tracks = sp.tracks(track_ids)['tracks']
     tracks_info = []
-    for track in tracks:
-        tracks_info.append({
-            'name': track['name'],
-            'artist': track['artists'][0]['name']
-        })
-    return tracks_info
+    return [{
+        'name': track['name'], 
+        'artist': track['artists'][0]['name']
+        } for track in tracks]
