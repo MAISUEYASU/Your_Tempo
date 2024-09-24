@@ -9,21 +9,34 @@ app = Flask(__name__, static_folder='static')
 def index():
     return render_template('index.html')
 
+@app.route('/login')
+def login():
+    # Spotifyの認証URLにリダイレクト
+    auth_url = sp.auth_manager.get_authorize_url()
+    return redirect(auth_url)
+
 @app.route('/callback')
 def callback():
     # Spotifyの認証コードを取得
     auth_code = request.args.get('code')
-    
     if auth_code:
         # 認証コードを使用してアクセストークンを取得
         sp.auth_manager.get_access_token(auth_code)
         return redirect(url_for('profile'))  # 認証が成功したらプロファイルページにリダイレクト
-    return jsonify({'error': '認証コードがありません'}), 400
+    return jsonify({'error': '認証に失敗しました'}), 400
+
+@app.route('/get_user_info')
+def get_user_info():
+    user_info = sp.current_user()
+    if user_info:
+        return jsonify({'userName': user_info['display_name']})
+    return jsonify({'error': 'ユーザー情報が取得できません'}), 400
+
 
 @app.route('/profile')
 def profile():
     user_info = sp.current_user()
-    return f"Hello, {user_info['display_name']}! Welcome to your Spotify profile."
+    return render_template('profile.html')
 
 # プレイリスト作成処理
 @app.route('/create_playlist', methods=['POST'])
@@ -40,23 +53,23 @@ def create_playlist():
         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S") 
 
         # 日時を含めたプレイリスト名を作成
-        playlist_name = f"Tempo {tempo} Playlist - {formatted_date}"
+        playlist_name = f"Tempo {tempo} - {formatted_date}"
 
         # Spotifyにプレイリストを作成し、曲を追加
-        playlist_id = create_playlist(name=f'Tempo {tempo} Playlist')
+        playlist_id = create_playlist (name=playlist_name)
         add_tracks_to_playlist(playlist_id, track_ids)
 
         # トラック情報（名前とアーティスト）を取得してクライアントに送り返す
         tracks_info = get_tracks_info(track_ids)
 
         # プレイリストのリンクを生成
-        playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
+        # playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
 
         return jsonify({
             'message': 'プレイリストの作成に成功したよ！', 
             'playlist_id': playlist_id,
             'tracks': tracks_info  # 曲情報を返す
-        })
+        }), 201
     return jsonify({'error': 'テンポが指定されていません。'}), 400
 
 @app.route('/calculate-tempo', methods=['POST'])

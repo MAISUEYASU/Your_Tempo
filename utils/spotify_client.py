@@ -6,7 +6,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=SPOTIPY_CLIENT_ID,
     client_secret=SPOTIPY_CLIENT_SECRET,
     redirect_uri=SPOTIPY_REDIRECT_URI,
-    scope="playlist-modify-public"
+    scope="user-read-private playlist-modify-public"
 ))
 
 def search_tracks_by_tempo(tempo, limit=10):
@@ -21,7 +21,7 @@ def search_tracks_by_tempo(tempo, limit=10):
 
 def create_playlist(name):
     user_id = sp.current_user()['id']
-    playlist = sp.user_playlist_create(user_id, name)
+    playlist = sp.user_playlist_create(user_id=user_id, name=name)
     return playlist['id']
 
 def add_tracks_to_playlist(playlist_id, track_ids):
