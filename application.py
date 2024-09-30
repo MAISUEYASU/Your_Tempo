@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template, request, jsonify, url_for
-from utils.spotify_client import search_tracks_by_tempo, create_playlist, add_tracks_to_playlist, get_tracks_info, sp
+from utils.spotify_client import search_tracks_by_tempo, generate_playlist_based_on_bpm, add_tracks_to_playlist, get_tracks_info, sp
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
@@ -39,25 +39,32 @@ def profile():
     return render_template('profile.html')
 
 # プレイリスト作成処理
-@app.route('/create_playlist', methods=['POST'])
-def create_playlist():
+@app.route('/generate_playlist', methods=['POST'])
+def generate_playlist():
     data = request.json
     tempo = data.get('tempo')
     
     if tempo:
-        # テンポに合った曲を検索
+        #  ユーザーIDを取得
+        user_id = sp.current_user()['id']
+
+        # テンポに合った曲を検索してプレイリストを生成
+        playlist_id = generate_playlist_based_on_bpm(user_id, tempo) # type: ignore
+
+        # 曲をプレイリストに追加（ここは別途行うなら明示的に追加）
         track_ids = search_tracks_by_tempo(tempo)
+        add_tracks_to_playlist(playlist_id, track_ids)
 
         # 現在の日時を取得し、フォーマットする
-        now = datetime.now()
-        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S") 
+        # now = datetime.now()
+        # formatted_date = now.strftime("%Y-%m-%d %H:%M:%S") 
 
         # 日時を含めたプレイリスト名を作成
-        playlist_name = f"Tempo {tempo} - {formatted_date}"
+        # playlist_name = f"Tempo {tempo} - {formatted_date}"
 
         # Spotifyにプレイリストを作成し、曲を追加
-        playlist_id = create_playlist (name=playlist_name)
-        add_tracks_to_playlist(playlist_id, track_ids)
+        # playlist_id = create_playlist (name=playlist_name)
+        # add_tracks_to_playlist(playlist_id, track_ids)
 
         # トラック情報（名前とアーティスト）を取得してクライアントに送り返す
         tracks_info = get_tracks_info(track_ids)
@@ -66,7 +73,7 @@ def create_playlist():
         # playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
 
         return jsonify({
-            'message': 'プレイリストの作成に成功したよ！', 
+            'message': 'プレイリストの作成に成功しました！', 
             'playlist_id': playlist_id,
             'tracks': tracks_info  # 曲情報を返す
         }), 201

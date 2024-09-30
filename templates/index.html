@@ -13,7 +13,7 @@
     <button id="spotifyLoginButton">Spotifyログイン</button>
     <p id="userNameDisplay"></p>
     <p id="savePlaylistButtonContainer">
-      <button id="savePlaylistButton" style="display: none">
+      <button id="savePlaylistButton">
         プレイリストを保存
       </button>
     </p>
@@ -45,97 +45,103 @@
       let tapTimes = [];
       let tempo = 0;
 
-      // ボタンがクリックされた時の処理
+      // Spotifyユーザーのトップアーティストを基におすすめの楽曲を取得
+      function getTopTracks(access_token) {
+        fetch("https://api.spotify.com/v1/me/top/artists?limit=5", {
+          headers: {
+            Authorization: "Bearer " + access_token,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const seed_artists = data.items
+              .map((artist) => artist.id)
+              .join(",");
+            return fetch(
+              `https://api.spotify.com/v1/recommendations?seed_artists=${seed_artists}&limit=10`,
+              {
+                headers: {
+                  Authorization: "Bearer " + access_token,
+                },
+              }
+            );
+          })
+          .then((response) => response.json())
+          .then((recommendations) => {
+            document.getElementById("playlist").innerHTML = `
+					<h2>おすすめのプレイリスト:</h2>
+					<ul>
+							${recommendations.tracks
+                .map(
+                  (track) => `
+									<li>
+											<a href="https://open.spotify.com/track/${track.id}" target="_blank">
+													${track.name} by ${track.artists[0].name}
+											</a>
+									</li>
+                  `
+                )
+                .join("")}
+					</ul>`;
+          });
+      }
+
       document
         .getElementById("tapButton")
         .addEventListener("click", function () {
-          const currentTime = Date.now(); // 現在の時間を取得
-          tapTimes.push(currentTime); //タップの時間を記録
+          const currentTime = Date.now();
+          tapTimes.push(currentTime);
 
-          // 2回以上タップされている場合、テンポを計算する
           if (tapTimes.length > 1) {
             const intervals = tapTimes
-              .slice(1) // 最初の要素を除く
-              .map((time, i) => time - tapTimes[i]); // 各タップの間隔を計算
+              .slice(1)
+              .map((time, i) => time - tapTimes[i]);
             const avgInterval =
-              intervals.reduce((a, b) => a + b) / intervals.length; // 平均間隔
-            tempo = Math.round(60000 / avgInterval); // BPMを計算
+              intervals.reduce((a, b) => a + b) / intervals.length;
+            const tempo = Math.round(60000 / avgInterval);
             document.getElementById(
               "tempoDisplay"
-            ).textContent = `Tempo: ${tempo} BPM`; // テンポを表示
-          }
+            ).textContent =` Tempo: ${tempo} BPM`;
 
-          // ５回以上タップした場合、テンポをサーバー送信してプレイリストを作成
-          if (tapTimes.length > 5) {
-            fetch("/create_playlist", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ tempo: tempo }), // 計測したテンポを送信
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.tracks) {
-                  // 取得したプレイリストの曲を表示
-                  document.getElementById(
-                    "playlist"
-                  ).innerHTML = `<h2>生成されたプレイリスト:</h2>
-            <ul>${data.tracks
-              .map((track) => `<li>${track.name} by ${track.artist}</li>`)
-              .join("")}</ul>`;
-                } else {
-                  alert("エラーが発生しました: " + data.error);
-                }
+            if (tapTimes.length > 5) {
+              fetch("/generate_playlist", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ tempo: tempo }),
               })
-              .catch((error) => {
-                alert(
-                  "プレイリストの作成中にエラーが発生しました。もう一度お試しください。"
-                );
-                console.error("エラー:", error);
-              });
-            // プレイリスト保存ボタンの処理
-            document
-              .getElementById("savePlaylistButton")
-              .addEventListener("click", function () {
-                fetch("/save_playlist", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ tempo: tempo }), // プレイリストを保存するためのデータを送信
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log(data); // デバッグ用
+                  const filteredTracks = ( data.tracks  || [] ).filter(
+                    track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name));
+                  document.getElementById("playlist").innerHTML = `
+									<h2>生成されたプレイリスト:</h2>
+<ul>
+  ${filteredTracks
+    .map(
+      (track) => `
+      <li style="display: flex; align-items: center;">
+        <img src='${track.album_image}' alt="Album cover" width="50" height="50" style="margin-right: 10px;" />
+        <a href="https://open.spotify.com/track/${track.id}" target="_blank">
+          ${track.name} by ${track.artists?.[0]?.name || 'Unknown Artist'}
+        </a>
+      </li>
+      `
+    )
+    .join("")}
+</ul>`; 
                 })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    if (data.success) {
-                      alert("プレイリストが保存されました！");
-                    } else {
-                      alert("エラーが発生しました。");
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("エラー:", error);
-                    alert("保存中にエラーが発生しました。");
-                  });
-              });
+                .catch((error) => {
+                  alert(
+                    "プレイリストの作成中にエラーが発生しました。もう一度お試しください。"
+                  );
+                  console.error("エラー詳細:", error);
+                });
 
-            // プレイリストが生成された後、保存ボタンを表示
-            fetch("/create_playlist", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ tempo: tempo }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.tracks) {
-                  document.getElementById("savePlaylistButton").style.display =
-                    "block";
-                }
-              });
-
-            tapTimes = []; // タップの記録をリセット
+              tapTimes = [];
+            }
           }
         });
     </script>

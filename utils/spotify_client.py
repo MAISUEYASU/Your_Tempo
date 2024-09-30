@@ -19,9 +19,20 @@ def search_tracks_by_tempo(tempo, limit=10):
     track_ids = [track['id'] for track in results['tracks']['items']]
     return track_ids
 
-def create_playlist(name):
-    user_id = sp.current_user()['id']
-    playlist = sp.user_playlist_create(user_id=user_id, name=name)
+def generate_playlist_based_on_bpm(user_id, tempo, limit=10):
+    # 現在の日時を取得してプレイリスト名を作成
+    from datetime import datetime
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    playlist_name = f"Tempo {tempo} - {now}"
+
+    # プレイリストを作成
+    playlist = sp.user_playlist_create(user=user_id, name=playlist_name)
+
+    # テンポに合った曲を検索し、プレイリストに追加
+    track_ids = search_tracks_by_tempo(tempo, limit=limit)
+    sp.playlist_add_items(playlist['id'], track_ids)
+
+    # プレイリストIDを返す
     return playlist['id']
 
 def add_tracks_to_playlist(playlist_id, track_ids):
@@ -33,15 +44,15 @@ def get_favorite_artists(user_id):
     for idx, artist in enumerate(results['items']):
         print(f"{idx + 1}. {artist['name']}")
 
+# Spotify APIからトラックのオーディオフィーチャーを取得
 def get_audio_features(track_ids):
-    # Spotify APIからトラックのオーディオフィーチャーを取得
     audio_features = sp.audio_features(track_ids)
     return audio_features
 
 def get_tracks_info(track_ids):
     tracks = sp.tracks(track_ids)['tracks']
-    tracks_info = []
     return [{
         'name': track['name'], 
-        'artist': track['artists'][0]['name']
-        } for track in tracks]
+        'artist': track['artists'][0]['name'],
+        'album_image': track['album']['images'][0]['url']  # ジャケット画像のURL
+    } for track in tracks]

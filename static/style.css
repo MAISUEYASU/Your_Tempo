@@ -7,6 +7,11 @@ body {
   margin: 0;
   padding: 20px;
 }
+
+#savePlaylistButton{
+  display: none
+}
+
 #tapButton {
   background-color: #4caf50;
   color: white;
@@ -42,4 +47,50 @@ h1 {
 #tapButton:active {
   transform: scale(0.95);
   transition: transform 0.1s;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
+/* スマートフォン対応 */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  #playlist ul {
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* リストアイテムのスタイル */
+#playlist li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+#playlist img {
+  margin-right: 15px;
+}
+
+#playlist a {
+  text-decoration: none;
+  color: #333;
+}
+
+#playlist a:hover {
+  text-decoration: underline;
 }
