@@ -6,10 +6,22 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=SPOTIPY_CLIENT_ID,
     client_secret=SPOTIPY_CLIENT_SECRET,
     redirect_uri=SPOTIPY_REDIRECT_URI,
-    scope="user-read-private playlist-modify-public"
+    scope="user-read-private playlist-modify-public user-library-read"
 ))
 
+def ensure_token_valid():
+    # トークンの有効性を確認し、リフレッシュが必要であればリフレッシュ
+    token_info = sp.auth_manager.get_access_token(as_dict=True)
+    # print(token_info) # デバッグ用: token_infoの内容を確認
+
+    if sp.auth_manager.is_token_expired(token_info):
+        print("Token expired, refreshing...")
+        sp.auth_manager.refresh_access_token(token_info['refresh_token'])
+    else:
+        print("Token is valid")
+
 def search_tracks_by_tempo(tempo, limit=10):
+    ensure_token_valid()  # トークンの有効性を確認してリフレッシュ
     # ターゲットテンポの範囲を設定
     min_tempo = max(0, tempo - 5)
     max_tempo = tempo + 5
@@ -51,8 +63,16 @@ def get_audio_features(track_ids):
 
 def get_tracks_info(track_ids):
     tracks = sp.tracks(track_ids)['tracks']
+    for track in tracks:
+        print(f"Track Name: {track['name']}")  # トラック名
+        print(f"Artists Data: {track['artists']}")  # アーティスト情報のデバッグ用
+        print(f"Album: {track['album']['name']}")  # アルバム名
+
     return [{
         'name': track['name'], 
-        'artist': track['artists'][0]['name'],
-        'album_image': track['album']['images'][0]['url']  # ジャケット画像のURL
+        'artist': ', '.join([artist['name'] for artist in track['artists']]) if track['artists'] else 'Unknown Artist',
+        'album_image': track['album']['images'][0]['url'] if track['album']['images'] else ''
     } for track in tracks]
+
+
+
