@@ -63,16 +63,29 @@ def get_audio_features(track_ids):
 
 def get_tracks_info(track_ids):
     tracks = sp.tracks(track_ids)['tracks']
+    track_info_list = []
+
     for track in tracks:
+        artist_names = ', '.join([artist['name'] for artist in track['artists']])
+        print(f"Track: {track['name']}, Artists: {artist_names}")  # アーティスト名が正しく取得されているか確認
+        track_info_list.append({
+            'name': track['name'], 
+            'artist': artist_names,  # アーティスト名をブラウザに渡す
+            'album_image': track['album']['images'][0]['url'] if track['album']['images'] else ''
+        })
+
+    return track_info_list
+
+"""     for track in tracks:
         print(f"Track Name: {track['name']}")  # トラック名
         print(f"Artists Data: {track['artists']}")  # アーティスト情報のデバッグ用
         print(f"Album: {track['album']['name']}")  # アルバム名
 
     return [{
         'name': track['name'], 
-        'artist': ', '.join([artist['name'] for artist in track['artists']]) if track['artists'] else 'Unknown Artist',
+        'artist': ', '.join([artist['name'] for artist in track['artists']]) ,
         'album_image': track['album']['images'][0]['url'] if track['album']['images'] else ''
-    } for track in tracks]
+    } for track in tracks] """
 
 
 
