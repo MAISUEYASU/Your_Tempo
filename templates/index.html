@@ -86,7 +86,92 @@
           });
       }
 
-      document
+    // ボタン
+    document
+  .getElementById("tapButton")
+  .addEventListener("click", function () {
+    const currentTime = Date.now();
+    tapTimes.push(currentTime);
+
+    // タップごとにボタンのサイズを拡大
+    let currentSize = document.getElementById("tapButton").offsetWidth;
+    let newSize = currentSize + 15;  // ●ピクセルずつ拡大
+    document.getElementById("tapButton").style.width = newSize + "px";
+    document.getElementById("tapButton").style.height = newSize + "px";
+    
+    // タップ回数のカウントを追跡
+    let tapCount = tapTimes.length;
+    document.getElementById("tempoDisplay").textContent = `Tap Count: ${tapCount}`;
+
+    if (tapTimes.length > 1) {
+      const intervals = tapTimes
+        .slice(1)
+        .map((time, i) => time - tapTimes[i]);
+      const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
+      const tempo = Math.round(60000 / avgInterval);
+
+      // 既存のテンポ表示機能を維持
+      document.getElementById("tempoDisplay").textContent = `Tempo: ${tempo} BPM`;
+
+      // 速度に応じてボタンの色を変更
+      if (tempo >= 80) {
+        document.getElementById("tapButton").style.backgroundColor = 'orange';
+      } else {
+        document.getElementById("tapButton").style.backgroundColor = 'lightgreen';
+      }
+
+      // タップ回数が5回に達したら
+      if (tapTimes.length >= 5) {
+        // プレイリストを生成
+        fetch("/generate_playlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tempo: tempo }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data); // デバッグ用
+            // アーティストデータをコンソールに表示
+            data.tracks.forEach(track => {
+              console.log(track.artists);
+            });
+            const filteredTracks = (data.tracks || []).filter(
+              track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name)
+            );
+            document.getElementById("playlist").innerHTML = `
+              <h2>生成されたプレイリスト:</h2>
+              <ul>
+                ${filteredTracks
+                  .map(
+                    (track) => `
+                    <li style="display: flex; align-items: center;">
+                      <img src='${track.album_image}' alt="Album cover" width="50" height="50" style="margin-right: 10px;" />
+                      <a href="https://open.spotify.com/track/${track.id}" target="_blank">
+                        ${track.name} by ${track.artists?.[0]?.name || 'Unknown Artist'}
+                      </a>
+                    </li>
+                  `
+                  )
+                  .join("")}
+              </ul>`;
+          })
+          .catch((error) => {
+            alert("プレイリストの作成中にエラーが発生しました。もう一度お試しください。");
+            console.error("エラー詳細:", error);
+          });
+
+        // ボタンの無効化とリセット
+        document.getElementById("tapButton").disabled = true;
+        document.getElementById("tempoDisplay").textContent = 'プレイリストを作成しました！';
+        tapTimes = [];  // タップ履歴のリセット
+      }
+    }
+  });
+
+
+/*       document
         .getElementById("tapButton")
         .addEventListener("click", function () {
           const currentTime = Date.now();
@@ -114,6 +199,10 @@
                 .then((response) => response.json())
                 .then((data) => {
                   console.log(data); // デバッグ用
+                  // アーティストデータをコンソールに表示
+                  data.tracks.forEach(track => {
+                  console.log(track.artists); 
+                });
                   const filteredTracks = ( data.tracks  || [] ).filter(
                     track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name));
                   document.getElementById("playlist").innerHTML = `
@@ -143,7 +232,8 @@
               tapTimes = [];
             }
           }
-        });
+        }); */
+      
     </script>
   </body>
 </html>
