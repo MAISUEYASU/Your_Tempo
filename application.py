@@ -45,37 +45,19 @@ def generate_playlist():
     tempo = data.get('tempo')
     
     if tempo:
-        #  ユーザーIDを取得
-        user_id = sp.current_user()['id']
+        user_id = sp.current_user()['id']  #  ユーザーIDを取得
 
-        # テンポに合った曲を検索してプレイリストを生成
-        playlist_id = generate_playlist_based_on_bpm(user_id, tempo) # type: ignore
+        # プレイリストIDとURLを生成
+        playlist_id, playlist_url = generate_playlist_based_on_bpm(user_id, tempo)
 
-        # 曲をプレイリストに追加（ここは別途行うなら明示的に追加）
-        track_ids = search_tracks_by_tempo(tempo)
-        add_tracks_to_playlist(playlist_id, track_ids)
-
-        # 現在の日時を取得し、フォーマットする
-        # now = datetime.now()
-        # formatted_date = now.strftime("%Y-%m-%d %H:%M:%S") 
-
-        # 日時を含めたプレイリスト名を作成
-        # playlist_name = f"Tempo {tempo} - {formatted_date}"
-
-        # Spotifyにプレイリストを作成し、曲を追加
-        # playlist_id = create_playlist (name=playlist_name)
-        # add_tracks_to_playlist(playlist_id, track_ids)
-
-        # トラック情報（名前とアーティスト）を取得してクライアントに送り返す
-        tracks_info = get_tracks_info(track_ids)
-
-        # プレイリストのリンクを生成
-        # playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
+        # 楽曲情報を取得
+        tracks_info = get_tracks_info(search_tracks_by_tempo(tempo))
 
         return jsonify({
-            'message': 'プレイリストの作成に成功しました！', 
+            'message': 'プレイリストの作成に成功しました！',
             'playlist_id': playlist_id,
-            'tracks': tracks_info  # 曲情報を返す
+            'playlist_url': playlist_url,  # プレイリストURLをフロントエンドに返す
+            'tracks': tracks_info
         }), 201
     return jsonify({'error': 'テンポが指定されていません。'}), 400
 

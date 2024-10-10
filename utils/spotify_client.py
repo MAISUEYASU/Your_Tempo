@@ -44,8 +44,9 @@ def generate_playlist_based_on_bpm(user_id, tempo, limit=10):
     track_ids = search_tracks_by_tempo(tempo, limit=limit)
     sp.playlist_add_items(playlist['id'], track_ids)
 
-    # プレイリストIDを返す
-    return playlist['id']
+    # プレイリストのURLを生成して返す
+    playlist_url = f"https://open.spotify.com/playlist/{playlist['id']}"
+    return playlist['id'], playlist_url  # プレイリストIDとURLを返す
 
 def add_tracks_to_playlist(playlist_id, track_ids):
     sp.playlist_add_items(playlist_id, track_ids)
@@ -67,25 +68,11 @@ def get_tracks_info(track_ids):
 
     for track in tracks:
         artist_names = ', '.join([artist['name'] for artist in track['artists']])
-        print(f"Track: {track['name']}, Artists: {artist_names}")  # アーティスト名が正しく取得されているか確認
         track_info_list.append({
             'name': track['name'], 
-            'artist': artist_names,  # アーティスト名をブラウザに渡す
-            'album_image': track['album']['images'][0]['url'] if track['album']['images'] else ''
+            'artist': artist_names,  
+            'album_image': track['album']['images'][0]['url'] if track['album']['images'] else '',
+            'id': track['id']  # トラックIDを追加して返す
         })
 
     return track_info_list
-
-"""     for track in tracks:
-        print(f"Track Name: {track['name']}")  # トラック名
-        print(f"Artists Data: {track['artists']}")  # アーティスト情報のデバッグ用
-        print(f"Album: {track['album']['name']}")  # アルバム名
-
-    return [{
-        'name': track['name'], 
-        'artist': ', '.join([artist['name'] for artist in track['artists']]) ,
-        'album_image': track['album']['images'][0]['url'] if track['album']['images'] else ''
-    } for track in tracks] """
-
-
-

@@ -76,7 +76,7 @@
                   (track) => `
 									<li>
 											<a href="https://open.spotify.com/track/${track.id}" target="_blank">
-													${track.name} by ${track.artists[0].name}
+													${track.name} by ${track.artists?.[0]?.name || 'Unknown Artist'}
 											</a>
 									</li>
                   `
@@ -132,35 +132,36 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data); // デバッグ用
-            // アーティストデータをコンソールに表示
-            data.tracks.forEach(track => {
-              console.log(track.artists);
-            });
-            const filteredTracks = (data.tracks || []).filter(
-              track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name)
-            );
-            document.getElementById("playlist").innerHTML = `
-              <h2>生成されたプレイリスト:</h2>
-              <ul>
-                ${filteredTracks
-                  .map(
-                    (track) => `
-                    <li style="display: flex; align-items: center;">
-                      <img src='${track.album_image}' alt="Album cover" width="50" height="50" style="margin-right: 10px;" />
-                      <a href="https://open.spotify.com/track/${track.id}" target="_blank">
-                        ${track.name} by ${track.artists?.[0]?.name || 'Unknown Artist'}
-                      </a>
-                    </li>
-                  `
-                  )
-                  .join("")}
-              </ul>`;
-          })
-          .catch((error) => {
-            alert("プレイリストの作成中にエラーが発生しました。もう一度お試しください。");
-            console.error("エラー詳細:", error);
-          });
+            console.log(data); // デバッグ用：プレイリスト全体を確認
+            // プレイリストのリンクを表示
+      document.getElementById("playlist").innerHTML = `
+        <h2>プレイリストが作成されました！</h2>
+        <p>プレイリストはこちらから確認できます:</p>
+        <a href="${data.playlist_url}" target="_blank">Spotifyでプレイリストを開く</a>
+      `;
+
+      // 楽曲リストを表示
+      const filteredTracks = (data.tracks || []).filter(
+        track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name)
+      );
+      document.getElementById("playlist").innerHTML += `
+        <ul>
+          ${filteredTracks
+            .map(
+              (track) => `
+              <li>
+                <img src='${track.album_image}' width="50" height="50" />
+                ${track.name} by ${track.artist}
+              </li>
+            `
+            )
+            .join("")}
+        </ul>`;
+    })
+    .catch((error) => {
+      alert("プレイリストの作成中にエラーが発生しました。もう一度お試しください。");
+      console.error("エラー詳細:", error);
+    });
 
         // ボタンの無効化とリセット
         document.getElementById("tapButton").disabled = true;
@@ -170,70 +171,6 @@
     }
   });
 
-
-/*       document
-        .getElementById("tapButton")
-        .addEventListener("click", function () {
-          const currentTime = Date.now();
-          tapTimes.push(currentTime);
-
-          if (tapTimes.length > 1) {
-            const intervals = tapTimes
-              .slice(1)
-              .map((time, i) => time - tapTimes[i]);
-            const avgInterval =
-              intervals.reduce((a, b) => a + b) / intervals.length;
-            const tempo = Math.round(60000 / avgInterval);
-            document.getElementById(
-              "tempoDisplay"
-            ).textContent =` Tempo: ${tempo} BPM`;
-
-            if (tapTimes.length > 5) {
-              fetch("/generate_playlist", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ tempo: tempo }),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  console.log(data); // デバッグ用
-                  // アーティストデータをコンソールに表示
-                  data.tracks.forEach(track => {
-                  console.log(track.artists); 
-                });
-                  const filteredTracks = ( data.tracks  || [] ).filter(
-                    track => !/\b(BPM|bpm|tempo|TEMPO)\b/.test(track.name));
-                  document.getElementById("playlist").innerHTML = `
-									<h2>生成されたプレイリスト:</h2>
-<ul>
-  ${filteredTracks
-    .map(
-      (track) => `
-      <li style="display: flex; align-items: center;">
-        <img src='${track.album_image}' alt="Album cover" width="50" height="50" style="margin-right: 10px;" />
-        <a href="https://open.spotify.com/track/${track.id}" target="_blank">
-          ${track.name} by ${track.artists?.[0]?.name || 'Unknown Artist'}
-        </a>
-      </li>
-      `
-    )
-    .join("")}
-</ul>`; 
-                })
-                .catch((error) => {
-                  alert(
-                    "プレイリストの作成中にエラーが発生しました。もう一度お試しください。"
-                  );
-                  console.error("エラー詳細:", error);
-                });
-
-              tapTimes = [];
-            }
-          }
-        }); */
-      
     </script>
   </body>
 </html>
