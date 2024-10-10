@@ -18,7 +18,9 @@
       </button>
     </p>
     <h3>あなたの気分でタップしてね</h3>
-    <button id="tapButton">Tap</button>
+    <div>
+      <button id="tapButton">Tap</button>
+    </div>
     <p id="tempoDisplay">Tempo: 0 BPM</p>
     <p id="playlist"></p>
     <script>
@@ -87,9 +89,7 @@
       }
 
     // ボタン
-    document
-  .getElementById("tapButton")
-  .addEventListener("click", function () {
+    document.getElementById("tapButton").addEventListener("click", function () {
     const currentTime = Date.now();
     tapTimes.push(currentTime);
 
@@ -104,13 +104,16 @@
     document.getElementById("tempoDisplay").textContent = `Tap Count: ${tapCount}`;
 
     if (tapTimes.length > 1) {
-      const intervals = tapTimes
-        .slice(1)
+      const intervals = tapTimes.slice(1)
         .map((time, i) => time - tapTimes[i]);
       const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
       const tempo = Math.round(60000 / avgInterval);
 
-      // 既存のテンポ表示機能を維持
+      // アニメーション速度をテンポに合わせて調整
+      let animationSpeed = 60 / tempo; // 1秒のアニメーションをテンポに合わせる
+      document.getElementById("tapButton").style.setProperty('--animation-duration', `${animationSpeed}s`);
+
+      // テンポ表示機能
       document.getElementById("tempoDisplay").textContent = `Tempo: ${tempo} BPM`;
 
       // 速度に応じてボタンの色を変更
@@ -120,9 +123,8 @@
         document.getElementById("tapButton").style.backgroundColor = 'lightgreen';
       }
 
-      // タップ回数が5回に達したら
+      // タップ回数が5回に達したらプレイリストを生成
       if (tapTimes.length >= 5) {
-        // プレイリストを生成
         fetch("/generate_playlist", {
           method: "POST",
           headers: {
@@ -132,8 +134,9 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data); // デバッグ用：プレイリスト全体を確認
-            // プレイリストのリンクを表示
+          // プレイリスト作成時に波紋のアニメーションを停止
+          document.getElementById("tapButton").style.animation = 'none';
+      // プレイリストのリンクを表示
       document.getElementById("playlist").innerHTML = `
         <h2>プレイリストが作成されました！</h2>
         <p>プレイリストはこちらから確認できます:</p>
