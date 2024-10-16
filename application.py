@@ -1,8 +1,22 @@
 from flask import Flask, redirect, render_template, request, jsonify, url_for
+import cv2
+from deepface import DeepFace
 from utils.spotify_client import search_tracks_by_tempo, generate_playlist_based_on_bpm, add_tracks_to_playlist, get_tracks_info, sp
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
+
+# 表情認識
+def detect_emotion():
+    cap = cv2.VideoCapture(0)
+    ret, frame = cap.read()
+    if ret:
+        faces = DeepFace.analyze(frame, actions=['emotion'])
+        dominant_emotion = faces['dominant_emotion']
+        cap.release()
+        return dominant_emotion
+    cap.release()
+    return "neutral"  # 表情が認識できない場合
 
 # メインページ
 @app.route('/')
@@ -45,7 +59,11 @@ def generate_playlist():
     tempo = data.get('tempo')
     
     if tempo:
-        user_id = sp.current_user()['id']  #  ユーザーIDを取得
+        # 表情認識を実行
+        emotion = detect_emotion()
+
+        #  ユーザーIDを取得
+        user_id = sp.current_user()['id']  
 
         # プレイリストIDとURLを生成
         playlist_id, playlist_url = generate_playlist_based_on_bpm(user_id, tempo)
@@ -56,7 +74,8 @@ def generate_playlist():
         return jsonify({
             'message': 'プレイリストの作成に成功しました！',
             'playlist_id': playlist_id,
-            'playlist_url': playlist_url,  # プレイリストURLをフロントエンドに返す
+            'playlist_url': playlist_url, 
+            'emotion': emotion, 
             'tracks': tracks_info
         }), 201
     return jsonify({'error': 'テンポが指定されていません。'}), 400
