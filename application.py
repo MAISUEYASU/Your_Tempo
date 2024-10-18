@@ -6,17 +6,22 @@ from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
 
-# 表情認識
-def detect_emotion():
+# 顔認識で年齢・性別・感情を取得
+def detect_face_attributes():
     cap = cv2.VideoCapture(0)
     ret, frame = cap.read()
     if ret:
-        faces = DeepFace.analyze(frame, actions=['emotion'])
-        dominant_emotion = faces['dominant_emotion']
-        cap.release()
-        return dominant_emotion
+        try:
+            result = DeepFace.analyze(frame, actions=['age', 'gender', 'emotion'], enforce_detection=False)
+            cap.release()
+            return result
+        except Exception as e:
+            print(f"Error: {e}")
+            cap.release()
+            return {'age': 'N/A', 'gender': 'N/A', 'emotion': 'neutral'}
     cap.release()
-    return "neutral"  # 表情が認識できない場合
+    return {'age': 'N/A', 'gender': 'N/A', 'emotion': 'neutral'}
+
 
 # メインページ
 @app.route('/')
@@ -52,7 +57,32 @@ def profile():
     user_info = sp.current_user()
     return render_template('profile.html')
 
-# プレイリスト作成処理
+@app.route('/generate_playlist', methods=['POST'])
+def generate_playlist():
+    data = request.json
+    tempo = data.get('tempo')
+    # 顔認識データ取得
+    face_data = face_data[0]
+    age = face_data['age']
+    gender = face_data['gender']
+    emotion = face_data['dominant_emotion']
+
+    # プレイリスト生成処理
+    user_id = sp.current_user()['id']
+    playlist_id, playlist_url = generate_playlist_based_on_bpm(
+        user_id, tempo, emotion, age, gender)
+
+    return jsonify({
+        'message': 'プレイリストが作成されました！',
+            'playlist_id': playlist_id,
+            'playlist_url': playlist_url, 
+            'emotion': emotion
+            # 'tracks': tracks_info
+    }), 201
+    return jsonify({'error': 'テンポが指定されていません。'}), 400
+
+
+""" # プレイリスト作成処理
 @app.route('/generate_playlist', methods=['POST'])
 def generate_playlist():
     data = request.json
@@ -78,7 +108,7 @@ def generate_playlist():
             'emotion': emotion, 
             'tracks': tracks_info
         }), 201
-    return jsonify({'error': 'テンポが指定されていません。'}), 400
+    return jsonify({'error': 'テンポが指定されていません。'}), 400 """
 
 @app.route('/calculate-tempo', methods=['POST'])
 def calculate_tempo():

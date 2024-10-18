@@ -12,6 +12,16 @@
     <h3>(テンポ測定アプリ)</h3>
     <button id="spotifyLoginButton">Spotifyログイン</button>
     <p id="userNameDisplay"></p>
+
+    <!-- 顔認識のオプション -->
+    <h3>顔認識を利用しますか？</h3>
+    <button id="cameraOptionYes">Yes</button>
+    <button id="cameraOptionNo">No</button>
+
+    <!-- カメラ映像表示部分（Yesが選択された場合のみ表示） -->
+    <div id="cameraSection" style="display: none;">
+      <video id="videoFeed" width="320" height="240" autoplay></video>
+    </div>
     <p id="savePlaylistButtonContainer">
       <button id="savePlaylistButton">
         プレイリストを保存
@@ -23,6 +33,7 @@
     </div>
     <p id="tempoDisplay">Tempo: 0 BPM</p>
     <p id="playlist"></p>
+
     <script>
       // Spotify認証処理
       document
@@ -43,6 +54,28 @@
               "none"; // ログインボタンを非表示
           }
         });
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('cameraOptionYes').addEventListener('click', () => {
+        document.getElementById('cameraSection').style.display = 'block';
+        document.getElementById('tapButtonSection').style.display = 'block';
+        startCamera();  // カメラ起動
+      });
+
+      document.getElementById('cameraOptionNo').addEventListener('click', () => {
+        document.getElementById('tapButtonSection').style.display = 'block';
+      });
+    });
+
+      // カメラの起動関数
+      function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            document.getElementById('videoFeed').srcObject = stream;
+          })
+          .catch(err => {
+            console.error("カメラの起動に失敗しました: ", err);
+          });
+      }
 
       let tapTimes = [];
       let tempo = 0;
