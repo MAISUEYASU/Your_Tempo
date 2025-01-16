@@ -1,0 +1,43 @@
+2025/1/16
+# プロジェクトディレクトリの作成
+mkdir your_tempo
+cd your_tempo
+
+# 仮想環境の作成
+python -m venv venv
+
+# 仮想環境の有効化
+# Windowsの場合
+venv\Scripts\activate
+# macOS/Linuxの場合
+source venv/bin/activate
+
+# Flaskのインストール
+pip install Flask
+
+# Flask-CORSのインストール（CORS対応のため）
+pip install flask-cors
+
+# 必要なパッケージをrequirements.txtに保存
+pip freeze > requirements.txt
+
+#Githubでレポジトリを準備、Git初期化
+cd your_tempo
+git init
+
+#GitHubのリポジトリをリモートリポジトリとして追加
+git remote add origin https://github.com/MAISUEYASU/Your_Tempo.git
+
+##現在設定されているリモートリポジトリを確認
+git remote -v
+
+##リモートリポジトリを上書きする
+git remote remove origin
+（上記実行後に正しいものを打つ）git remote add origin https://github.com/MAISUEYASU/Your_Tempo.git
+
+#リモートリポジトリを確認
+git remote -v
+
+#.gitignoreファイルを作成し、以下を追加
+
+
