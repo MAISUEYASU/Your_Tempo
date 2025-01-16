@@ -1,4 +1,4 @@
-2025/1/16
+------2025/1/16------
 # プロジェクトディレクトリの作成
 mkdir your_tempo
 cd your_tempo
@@ -38,6 +38,19 @@ git remote remove origin
 #リモートリポジトリを確認
 git remote -v
 
-#.gitignoreファイルを作成し、以下を追加
+#ルートディレクトリ内に「.gitignore」ファイルを作成し、以下を追加
+venv/
+node_modules/
+*.env
+__pycache__/
+.DS_Store
 
+#すでにREADME.mdがGitHubに作成されている場合は、以下でローカルと同期
+git pull origin main
 
+#初回のコミットを作成してリポジトリにプッシュ
+git add .
+git commit -m "Initial commit: Project setup"
+git push -u origin main
+
+------2025/1/16------
