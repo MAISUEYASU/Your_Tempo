@@ -1,0 +1,172 @@
+@charset "utf-8";
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+  height: 100vh; /* 画面全体を使うため */
+  display: flex;
+  flex-direction: column; /* 縦方向に要素を並べる */
+  justify-content: center;
+  align-items: center;
+}
+
+#savePlaylistButton {
+  display: none;
+}
+
+.btn_box {
+  /* 親要素を中央に配置 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+#tapButton {
+  display: block;
+  position: relative;
+  width: 200px;
+  height: 78px;
+  line-height: 78px;
+  font-size: 24px;
+  border-radius: 39px;
+  text-decoration: none;
+  background-color: #63d4db;
+  color: #fbfbfb;
+  text-align: center;
+  transition: 0.2s;
+  cursor: pointer;
+  /* overflow: hidden; 削除: 波紋がはみ出すようにするため */
+}
+
+#tapButton:before, #tapButton:after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  background: rgba(166, 249, 255, 0.5);
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  transition: transform var(--animation-duration, 1s) ease-out, opacity var(--animation-duration, 1s) ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+#tapButton:before {
+  animation: ripple var(--animation-duration, 1s) ease-out infinite;
+}
+
+#tapButton:after {
+  animation: ripple var(--animation-duration, 1s) ease-out 1s infinite;
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5); /* 初期状態 */
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5); /* ボタン外に広がる波紋 */
+    opacity: 0;
+  }
+}
+
+#tapButton:hover {
+  background-color: #45a049;
+}
+
+h1,
+h3 {
+  color: #333;
+}
+
+h1 {
+  margin-top: 50px;
+}
+
+#playlist ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#playlist li {
+  background: #fff;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#tapButton:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
+
+/* スマートフォン対応 */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  #playlist ul {
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* リストアイテムのスタイル */
+#playlist li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+#playlist img {
+  margin-right: 15px;
+}
+
+#playlist a {
+  text-decoration: none;
+  color: #333;
+}
+
+#playlist a:hover {
+  text-decoration: underline;
+}

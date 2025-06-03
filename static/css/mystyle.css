@@ -1,0 +1,68 @@
+body,
+#wrapper {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+}
+
+#tapButton {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  font-size: 16px;
+  border-radius: 30px;
+  background-color: #63d4db;
+  color: #fbfbfb;
+  text-align: center;
+  cursor: pointer;
+  margin: auto;
+  transition: width 0.4s ease; /* 横幅のみ変化 */
+  border: 1px solid #000;
+}
+
+/* クリックごとの横幅の増加設定 */
+#tapButton[data-click-count="1"] {
+  width: 80px; /* 初期の横幅 */
+}
+
+#tapButton[data-click-count="2"] {
+  width: calc(80px * 1.2); /* 初期幅の120% */
+}
+
+#tapButton[data-click-count="3"] {
+  width: calc(80px * 1.4); /* 初期幅の140% */
+}
+
+#tapButton[data-click-count="4"] {
+  width: calc(80px * 1.6); /* 初期幅の160% */
+}
+
+#tapButton[data-click-count="5"] {
+  width: 100%; /* 5回目で親要素（header）幅いっぱいに */
+}
+
+#playlistLink,
+#retryButton {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+.button-custom {
+  min-width: 200px;
+  max-width: 100%;
+  height: 50px;
+  font-size: 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.button-custom:hover {
+  transform: translateY(-2px);
+}

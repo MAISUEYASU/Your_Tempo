@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>{% block title %}Your_Tempo{% endblock %}</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='assets/favicon.ico')}}"
+    />
+
+    <script
+      src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Google fonts-->
+    <link
+      href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i"
+      rel="stylesheet"
+    />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link
+      href="{{ url_for('static', filename='css/common.css')}}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/mystyle.css')}}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div id="wrapper" class="container-fluid">
+      <!-- Navigation-->
+      <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#page-top">Your_Tempo</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="#!">sample1</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#!">sample2</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <!--  -->
+      <header class="masthead text-center text-white">
+        <div class="masthead-content">
+          <div class="px-5">
+            <h1 class="masthead-heading mb-0">Your Tempo</h1>
+            <h4 class="masthead-subheading mb-0">
+              あなたのテンポで音楽を楽しむ
+            </h4>
+          </div>
+        </div>
+        {% block header %}{% endblock %}
+      </header>
+      {% block content %}{% endblock %}
+      <!-- モーダル読み込み -->
+      {% include 'modal.html' %}
+      <!-- Footer-->
+      <footer class="py-5 bg-black">
+        <div class="px-5">
+          <p class="m-0 text-center text-white small">
+            Copyright &copy; Your_Tempo 2024
+          </p>
+        </div>
+      </footer>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

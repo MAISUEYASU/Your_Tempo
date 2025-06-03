@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %}Your_Tempo ( テンポ測定アプリ ){% endblock %}
+<!--  -->
+{% block content %}
+<div class="text-center my-2">
+  <a id="spotify-login-btn" class="btn btn-success btn-xl rounded-pill">
+    Spotifyにログインする
+  </a>
+</div>
+<script src="{{ url_for('static', filename='js/spotifyAuth.js') }}"></script>
+{% endblock %}

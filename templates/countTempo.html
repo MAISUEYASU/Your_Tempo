@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %}テンポ測定|Your_Tempo{% endblock %}
+<!--  -->
+{% block content %}
+<div class="text-center mt-5">
+  <h2>ようこそ {{ username }} さん</h2>
+  <p id="messageText" class="fs-4">あなたの気分でタップしてね</p>
+  <p id="tempoDisplay" class="fs-5">Tempo: 0 BPM</p>
+  <button id="tapButton" class="btn btn-primary fs-5 mb-3 mt-0">Tap</button>
+</div>
+<script src="{{ url_for('static', filename='js/tempoCalculator.js') }}"></script>
+<script src="{{ url_for('static', filename='js/playlist.js') }}" defer></script>
+<script
+  src="{{ url_for('static', filename='js/generatePlaylist.js') }}"
+  defer
+></script>
+{% endblock %}
